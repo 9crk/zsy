@@ -42,6 +42,7 @@ BOOL CMySocket::KillTimeOut()
 	return KillTimer(NULL, m_nTimerID);
 }*/
 extern int isLineSafe[2];
+extern int writelog(char* str);
 void CMySocket::OnReceive(int nErrorCode)
 {
 	//MessageBox(NULL, "6666666666", NULL, IDOK);
@@ -53,7 +54,36 @@ void CMySocket::OnReceive(int nErrorCode)
 	int ret =Receive(buff,10);
 	
 	sscanf(buff, "<%d,%d>", &isLineSafe[0], &isLineSafe[1]);
-	
+	char tmp[100];
+	switch (isLineSafe[0])
+	{
+	case 0:
+		sprintf(tmp, "警报:线路短路,");
+		break;
+	case 1:
+		sprintf(tmp, "警报:线路正常,");
+		break;
+	case 2:
+		sprintf(tmp, "警报:线路断开,");
+		break;
+	default:;
+	}
+	switch (isLineSafe[1])
+	{
+	case 0:
+		sprintf(tmp, "%s天线短路", tmp);
+		break;
+	case 1:
+		sprintf(tmp, "%s天线正常", tmp);
+		break;
+	case 2:
+		sprintf(tmp, "%s天线断开", tmp);
+		break;
+	default:;
+	}
+	if (-1 == writelog(tmp)){
+		;
+	};
 //	CString xx;
 	//xx.Format("%d %d", addr, statu);
 	//isLineSafe[addr] = statu;//0 短路 1 安全 2 断开

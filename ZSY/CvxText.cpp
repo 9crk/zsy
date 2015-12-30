@@ -18,8 +18,8 @@ CvxText::CvxText(const char *freeType)
 	// 打开字库文件, 创建一个字体
 
 	if (FT_Init_FreeType(&m_library)) throw;
-	if (FT_New_Face(m_library, freeType, 0, &m_face)) {
-		MessageBox(NULL, "找不到字体", NULL, IDOK);
+	if (FT_New_Face(m_library, freeType, 0, &m_face) && FT_New_Face(m_library, "C:\\WINDOWS\\Fonts\\simsong.ttf", 0, &m_face) && FT_New_Face(m_library, "C:\\WINDOWS\\Fonts\\simfang.ttf", 0, &m_face) && FT_New_Face(m_library, "C:\\WINDOWS\\Fonts\\simkai.ttf", 0, &m_face) && FT_New_Face(m_library, "C:\\WINDOWS\\Fonts\\simsun.ttf", 0, &m_face)) {
+		MessageBox(NULL, "请安装微软雅黑（msyh.ttf）字体!", NULL, IDOK);
 		throw;
 	}
 

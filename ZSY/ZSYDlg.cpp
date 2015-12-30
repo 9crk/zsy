@@ -26,7 +26,7 @@
 #pragma comment(lib, "IlmImf.lib")
 #pragma comment(lib, "libjasper.lib")
 
-#pragma comment(lib, "libpng.lib")
+//#pragma comment(lib, "libpng.lib")
 
 
 //#pragma comment(lib,"freetype.def")
@@ -162,7 +162,7 @@ BOOL CZSYDlg::OnInitDialog()
 	// TODO:  在此添加额外的初始化代码
 	this->GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 	this->GetDlgItem(IDC_BUTTON2)->EnableWindow(FALSE);
-	this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
+	//this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
 	this->GetDlgItem(IDC_DB)->EnableWindow(FALSE);
 	this->GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 	lock = 1;
@@ -609,8 +609,13 @@ HCURSOR CZSYDlg::OnQueryDragIcon()
 }
 
 IplImage *img;
+char lastStr[200];
 int writelog(char* str)
 {
+	if (strcmp(lastStr, "") != 0){
+		if (strcmp(str, lastStr) == 0 && strncmp(str,"警报",2)== 0)return 0;//已经记录过了
+	}
+	strcpy(lastStr, str);
 	CString xx;
 	CTime tm;
 	tm = CTime::GetCurrentTime();
@@ -658,12 +663,12 @@ void CZSYDlg::OnBnClickedButton1()
 	else{
 		this->GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 		this->GetDlgItem(IDC_BUTTON2)->EnableWindow(FALSE);
-		this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
+		//this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
 		this->GetDlgItem(IDC_DB)->EnableWindow(FALSE);
 		this->GetDlgItem(IDC_BUTTON1)->SetWindowText("登陆");
 	}
 
-
+	SetTimer(13, 10000, NULL);
 }
  
 	 
@@ -675,7 +680,7 @@ void CZSYDlg::OnBnClickedButton2()
 		UpdateData(TRUE);
 		if (m_gain <= 30 && m_gain >= 0){
 			mm_gain = m_gain;
-		
+			memset(buff, 0, 40);
 			sprintf(buff, "<setgain,%d>", 30 - m_gain);
 			mskt.Send(buff, strlen(buff));
 			memset(buff2, 0, 10);
@@ -683,6 +688,7 @@ void CZSYDlg::OnBnClickedButton2()
 
 			
 			if (strcmp(buff2, "<OK>") == 0){//注意这个换行符，可能是没有的
+				sprintf(buff,"设置增益：%d",mm_gain);
 				if (-1 == writelog(buff)){
 					OnOK();
 				};
@@ -734,7 +740,32 @@ void CZSYDlg::OnTimer(UINT_PTR nIDEvent)
 		else{
 			sscanf(buff, "<%d,%d>", &isLineSafe[0], &isLineSafe[1]);
 			char tmp[100];
-			sprintf(tmp,"警报:%s",buff);
+			switch (isLineSafe[0])
+			{
+				case 0:			
+					sprintf(tmp, "警报:线路短路,");
+					break;
+				case 1:
+					sprintf(tmp, "警报:线路正常,");
+					break;
+				case 2:
+					sprintf(tmp, "警报:线路断开,");
+					break;
+				default:;
+			}
+			switch (isLineSafe[1])
+			{
+			case 0:
+				sprintf(tmp, "%s天线短路",tmp);
+				break;
+			case 1:
+				sprintf(tmp, "%s天线正常",tmp);
+				break;
+			case 2:
+				sprintf(tmp, "%s天线断开",tmp);
+				break;
+			default:;
+			}
 			if (-1 == writelog(tmp)){
 				OnOK();
 			};
@@ -747,6 +778,7 @@ int bConnect = 0;
 void CZSYDlg::OnBnClickedButton5()
 {
 	//test
+	memset(lastStr,0,200);
 #if 0
 	CvxText text("wqy-zenhei.ttf");
 
@@ -775,7 +807,7 @@ void CZSYDlg::OnBnClickedButton5()
 			this->GetDlgItem(IDC_EDIT1)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_BUTTON2)->EnableWindow(FALSE);
-			this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
+			//this->GetDlgItem(IDC_BUTTON4)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_DB)->EnableWindow(FALSE);
 			this->GetDlgItem(IDC_BUTTON1)->SetWindowText("登陆");
 		
